@@ -11,6 +11,8 @@ namespace FpcApi.Models
 
         public string Type { get; set; }
 
-        public double Capacity { get; set; }
+        public double MinCapacity { get; set; }
+
+        public double MaxCapacity { get; set; }
     }
 }

@@ -9,8 +9,10 @@ namespace FpcApi.Models
     {
         public Location Location { get; set; }
 
-        public IEnumerable<FrieghtEstimate> FrieghtEstimates { get; set; }
+        public FrieghtEstimate FrieghtEstimate { get; set; }
 
-        public IEnumerable<BuyerCashPrice> BuyerCashPrices { get; set; }
+        public BuyerCashPrice BuyerCashPrice { get; set; }
+
+        public decimal Profit { get; set; }
     }
 }

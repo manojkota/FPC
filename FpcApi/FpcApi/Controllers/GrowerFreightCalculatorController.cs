@@ -13,7 +13,7 @@ namespace FpcApi.Controllers
     public class GrowerFreightCalculatorController : ApiController
     {
         [HttpGet]
-        public IEnumerable<PriceOutput> Calculate()//[FromBody] RequestInput input)
+        public IEnumerable<PriceOutput> Calculate([FromBody] RequestInput input)
         {
             var dataLoader = new DataLoader();
 
@@ -22,11 +22,9 @@ namespace FpcApi.Controllers
             {
                 foreach (var loc in dataLoader.locations)
                 {
-                    PriceOutput output = new PriceOutput();
-                    
                     //calculate distance
                     var distance = 100;
-                    var truckTypes = dataLoader.truckTypes.Where(x => 20 <= x.Capacity);
+                    var truckTypes = dataLoader.truckTypes.Where(x => 20 >= x.MinCapacity && 20 <= x.MaxCapacity);
 
                     List<FrieghtEstimate> frieghtEstimates = new List<FrieghtEstimate>();
 
@@ -36,7 +34,7 @@ namespace FpcApi.Controllers
                         foreach (var frieghtCost in frieghtCosts)
                         {
                             FrieghtEstimate estimate = new FrieghtEstimate();
-                            FrieghtCompany frieghtCompany = dataLoader.frieghtCompanies.FirstOrDefault(x=> x.Id == frieghtCost.FrieghtCompanyId);
+                            FrieghtCompany frieghtCompany = dataLoader.frieghtCompanies.FirstOrDefault(x => x.Id == frieghtCost.FrieghtCompanyId);
 
                             estimate.FrieghtCompanyName = frieghtCompany.Name;
                             estimate.TruckType = truckType.Type;
@@ -46,9 +44,28 @@ namespace FpcApi.Controllers
                         }
                     }
 
-                    output.FrieghtEstimates = frieghtEstimates;
-                    
-                    result.Add(output);
+                    var cashPrices = dataLoader.cashPrices.Where(x => x.LocationId == loc.Id);
+                    foreach (var cashPrice in cashPrices)
+                    {
+                        foreach (var frieghtEstimate in frieghtEstimates)
+                        {
+                            PriceOutput output = new PriceOutput();
+                            output.Location = loc;
+                            output.BuyerCashPrice = new BuyerCashPrice
+                            {
+                                BuyerName = dataLoader.buyers.FirstOrDefault(x=> x.Id == cashPrice.BuyerId).Name,
+                                BuyerPrice = cashPrice.Price,
+                                Commodity = cashPrice.Commodity,
+                                Grade = cashPrice.Grade,
+                                Season = cashPrice.Season,
+                                EstimatedPrice = cashPrice.Price * 100
+                            };
+                            output.FrieghtEstimate = frieghtEstimate;
+                            output.Profit = output.BuyerCashPrice.EstimatedPrice - frieghtEstimate.EstimatedPrice;
+
+                            result.Add(output);
+                        }
+                    }
                 }
             }
 

@@ -206,13 +206,17 @@ namespace FpcApi.Common
                     continue;
                 }
 
-                TruckType obj = new TruckType
+                if (!string.IsNullOrEmpty(dataTable.Rows[i][0].ToString()))
                 {
-                    Id = Convert.ToInt64(dataTable.Rows[i][0].ToString().Replace(",", "")),
-                    Type = dataTable.Rows[i][1].ToString(),
-                    Capacity = Convert.ToDouble(dataTable.Rows[i][2].ToString())
-                };
-                _truckTypes.Add(obj);
+                    TruckType obj = new TruckType
+                    {
+                        Id = Convert.ToInt64(dataTable.Rows[i][0].ToString().Replace(",", "")),
+                        Type = dataTable.Rows[i][1].ToString(),
+                        MinCapacity = Convert.ToDouble(dataTable.Rows[i][2].ToString()),
+                        MaxCapacity = Convert.ToDouble(dataTable.Rows[i][3].ToString())
+                    };
+                    _truckTypes.Add(obj);
+                }
             }
         }
 
@@ -226,15 +230,17 @@ namespace FpcApi.Common
                 {
                     continue;
                 }
-
-                FrieghtCost obj = new FrieghtCost
+                if (!string.IsNullOrEmpty(dataTable.Rows[i][0].ToString()))
                 {
-                    Id = Convert.ToInt64(dataTable.Rows[i][0].ToString().Replace(",", "")),
-                    FrieghtCompanyId = Convert.ToInt64(dataTable.Rows[i][1].ToString().Replace(",", "")),
-                    TruckTypeId = Convert.ToInt64(dataTable.Rows[i][2].ToString().Replace(",", "")),
-                    CostPerKm = Convert.ToDecimal(dataTable.Rows[i][3].ToString())
-                };
-                _frieghtCosts.Add(obj);
+                    FrieghtCost obj = new FrieghtCost
+                    {
+                        Id = Convert.ToInt64(dataTable.Rows[i][0].ToString().Replace(",", "")),
+                        FrieghtCompanyId = Convert.ToInt64(dataTable.Rows[i][1].ToString().Replace(",", "")),
+                        TruckTypeId = Convert.ToInt64(dataTable.Rows[i][2].ToString().Replace(",", "")),
+                        CostPerKm = Convert.ToDecimal(dataTable.Rows[i][3].ToString())
+                    };
+                    _frieghtCosts.Add(obj);
+                }
             }
         }
 
@@ -248,18 +254,20 @@ namespace FpcApi.Common
                 {
                     continue;
                 }
-
-                CashPrice obj = new CashPrice
+                if (!string.IsNullOrEmpty(dataTable.Rows[i][0].ToString()))
                 {
-                    Id = Convert.ToInt64(dataTable.Rows[i][0].ToString().Replace(",", "")),
-                    BuyerId = Convert.ToInt64(dataTable.Rows[i][1].ToString().Replace(",", "")),
-                    LocationId = Convert.ToInt64(dataTable.Rows[i][2].ToString().Replace(",", "")),
-                    Commodity = dataTable.Rows[i][3].ToString(),
-                    Grade = dataTable.Rows[i][4].ToString(),
-                    Season = dataTable.Rows[i][5].ToString(),
-                    Price = Convert.ToDecimal(dataTable.Rows[i][6].ToString())
-                };
-                _cashPrices.Add(obj);
+                    CashPrice obj = new CashPrice
+                    {
+                        Id = Convert.ToInt64(dataTable.Rows[i][0].ToString().Replace(",", "")),
+                        BuyerId = Convert.ToInt64(dataTable.Rows[i][1].ToString().Replace(",", "")),
+                        LocationId = Convert.ToInt64(dataTable.Rows[i][2].ToString().Replace(",", "")),
+                        Commodity = dataTable.Rows[i][3].ToString(),
+                        Grade = dataTable.Rows[i][4].ToString(),
+                        Season = dataTable.Rows[i][5].ToString(),
+                        Price = Convert.ToDecimal(dataTable.Rows[i][6].ToString())
+                    };
+                    _cashPrices.Add(obj);
+                }
             }
         }
     }
