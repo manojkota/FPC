@@ -86,13 +86,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Common\DataLoader.cs" />
     <Compile Include="Controllers\GrowerFreightCalculatorController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\BuyerCashPrice.cs" />
+    <Compile Include="Models\CashPrice.cs" />
+    <Compile Include="Models\FrieghtCost.cs" />
+    <Compile Include="Models\FrieghtEstimate.cs" />
+    <Compile Include="Models\PriceOutput.cs" />
+    <Compile Include="Models\RequestInput.cs" />
+    <Compile Include="Models\TruckType.cs" />
+    <Compile Include="Models\FrieghtCompany.cs" />
+    <Compile Include="Models\Buyer.cs" />
+    <Compile Include="Models\Location.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\Data.xlsx" />
     <None Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -101,10 +113,12 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="App_Data\" />
-    <Folder Include="Common\" />
-    <Folder Include="Models\" />
+    <ProjectReference Include="..\ExcelService\ExcelService.csproj">
+      <Project>{c8c63162-8137-4292-bd98-e27c3ff5975b}</Project>
+      <Name>ExcelService</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
