@@ -165,7 +165,7 @@ namespace FpcApi.Controllers
                 }
             }
 
-            return result;
+            return result.Where(x=> x.Profit > 0).ToList();
         }
     }
 }
