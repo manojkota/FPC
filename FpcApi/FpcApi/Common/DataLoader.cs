@@ -144,14 +144,17 @@ namespace FpcApi.Common
                     continue;
                 }
 
-                Location location = new Location
+                if (!string.IsNullOrEmpty(dataTable.Rows[i][0].ToString()) && !string.IsNullOrWhiteSpace(dataTable.Rows[i][0].ToString()))
                 {
-                    Id = Convert.ToInt64(dataTable.Rows[i][0].ToString()),
-                    Name = dataTable.Rows[i][1].ToString(),
-                    Latitude = Convert.ToDouble(dataTable.Rows[i][2].ToString().Replace("\"","")),
-                    Longitude = Convert.ToDouble(dataTable.Rows[i][3].ToString().Replace("\"", ""))
-                };
-                _locations.Add(location);
+                    Location location = new Location
+                    {
+                        Id = Convert.ToInt64(dataTable.Rows[i][0].ToString()),
+                        Name = dataTable.Rows[i][1].ToString(),
+                        Latitude = Convert.ToDouble(dataTable.Rows[i][2].ToString().Replace("\"", "")),
+                        Longitude = Convert.ToDouble(dataTable.Rows[i][3].ToString().Replace("\"", ""))
+                    };
+                    _locations.Add(location);
+                }
             }
         }
 
@@ -166,12 +169,16 @@ namespace FpcApi.Common
                     continue;
                 }
 
-                Buyer buyer = new Buyer
+                if (!string.IsNullOrEmpty(dataTable.Rows[i][0].ToString()) && !string.IsNullOrWhiteSpace(dataTable.Rows[i][0].ToString()))
                 {
-                    Id = Convert.ToInt64(dataTable.Rows[i][0].ToString().Replace(",","")),
-                    Name = dataTable.Rows[i][1].ToString()
-                };
-                _buyers.Add(buyer);
+                    Buyer buyer = new Buyer
+                    {
+                        Id = Convert.ToInt64(dataTable.Rows[i][0].ToString().Replace(",", "")),
+                        Name = dataTable.Rows[i][1].ToString(),
+                        PaymentTerms = dataTable.Rows[i][2].ToString()
+                    };
+                    _buyers.Add(buyer);
+                }
             }
         }
 
@@ -186,12 +193,15 @@ namespace FpcApi.Common
                     continue;
                 }
 
-                FrieghtCompany obj = new FrieghtCompany
+                if (!string.IsNullOrEmpty(dataTable.Rows[i][0].ToString()) && !string.IsNullOrWhiteSpace(dataTable.Rows[i][0].ToString()))
                 {
-                    Id = Convert.ToInt64(dataTable.Rows[i][0].ToString().Replace(",", "")),
-                    Name = dataTable.Rows[i][1].ToString()
-                };
-                _frieghtCompanies.Add(obj);
+                    FrieghtCompany obj = new FrieghtCompany
+                    {
+                        Id = Convert.ToInt64(dataTable.Rows[i][0].ToString().Replace(",", "")),
+                        Name = dataTable.Rows[i][1].ToString()
+                    };
+                    _frieghtCompanies.Add(obj);
+                }
             }
         }
 
@@ -206,7 +216,7 @@ namespace FpcApi.Common
                     continue;
                 }
 
-                if (!string.IsNullOrEmpty(dataTable.Rows[i][0].ToString()))
+                if (!string.IsNullOrEmpty(dataTable.Rows[i][0].ToString()) && !string.IsNullOrWhiteSpace(dataTable.Rows[i][0].ToString()))
                 {
                     TruckType obj = new TruckType
                     {
@@ -230,7 +240,7 @@ namespace FpcApi.Common
                 {
                     continue;
                 }
-                if (!string.IsNullOrEmpty(dataTable.Rows[i][0].ToString()))
+                if (!string.IsNullOrEmpty(dataTable.Rows[i][0].ToString()) && !string.IsNullOrWhiteSpace(dataTable.Rows[i][0].ToString()))
                 {
                     FrieghtCost obj = new FrieghtCost
                     {
@@ -254,7 +264,7 @@ namespace FpcApi.Common
                 {
                     continue;
                 }
-                if (!string.IsNullOrEmpty(dataTable.Rows[i][0].ToString()))
+                if (!string.IsNullOrEmpty(dataTable.Rows[i][0].ToString()) && !string.IsNullOrWhiteSpace(dataTable.Rows[i][0].ToString()))
                 {
                     CashPrice obj = new CashPrice
                     {

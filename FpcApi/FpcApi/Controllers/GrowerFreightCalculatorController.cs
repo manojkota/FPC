@@ -106,7 +106,8 @@ namespace FpcApi.Controllers
                             Commodity = cashPrice.Commodity,
                             Grade = cashPrice.Grade,
                             Season = cashPrice.Season,
-                            EstimatedPrice = cashPrice.Price * Convert.ToDecimal(input.Quantity)
+                            EstimatedPrice = cashPrice.Price * Convert.ToDecimal(input.Quantity),
+                            PaymentTerms = dataLoader.buyers.FirstOrDefault(x => x.Id == cashPrice.BuyerId).PaymentTerms
                         };
                         output.FrieghtEstimate = frieghtEstimate;
                         output.Profit = (output.BuyerCashPrice.EstimatedPrice - frieghtEstimate.EstimatedPrice);

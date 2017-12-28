@@ -18,5 +18,7 @@ namespace FpcApi.Models
         public decimal BuyerPrice { get; set; }
 
         public decimal EstimatedPrice { get; set; }
+
+        public string PaymentTerms { get; set; }
     }
 }
