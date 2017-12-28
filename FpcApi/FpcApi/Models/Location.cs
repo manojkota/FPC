@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using FpcApi.Common;
 
 namespace FpcApi.Models
 {
@@ -14,5 +15,11 @@ namespace FpcApi.Models
         public double Latitude { get; set; }
 
         public double Longitude { get; set; }
+
+        public Coordinate GetCoordinate()
+        {
+            return new Coordinate(Convert.ToDecimal(Latitude), Convert.ToDecimal(Longitude));
+        }
+
     }
 }

@@ -5,7 +5,7 @@ using System.Web;
 
 namespace FpcApi.Common
 {
-    public struct Coordinate
+    public class Coordinate
     {
         public Coordinate(decimal latitude, decimal longitude)
         {
