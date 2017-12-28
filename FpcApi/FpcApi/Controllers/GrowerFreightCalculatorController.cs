@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,6 +9,9 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using FpcApi.Common;
 using FpcApi.Models;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
 
 namespace FpcApi.Controllers
 {
@@ -66,8 +70,11 @@ namespace FpcApi.Controllers
 
                 var distanceEstimator = dataLoader.locations.Zip(distances, (l, d) => new Tuple<Location, decimal>(l, (d/1000))).ToList();
 
-                return GetPriceOutput(distanceEstimator, input).OrderByDescending(x => x.Profit);
+                var results = GetPriceOutput(distanceEstimator, input).OrderByDescending(x => x.Profit);
 
+                SendTextMessage(results.FirstOrDefault());
+
+                return results;
             }
 
             return null;
@@ -166,6 +173,32 @@ namespace FpcApi.Controllers
             }
 
             return result.Where(x=> x.Profit > 0).ToList();
+        }
+
+        private async Task SendTextMessage(PriceOutput output)
+        {
+            try
+            {
+                if (output != null)
+                {
+                    if (!Convert.ToBoolean(ConfigurationManager.AppSettings["IsTest"].ToString()))
+                    {
+                        var accountSid = "AC6ead790059d3102fbd033485340ac87f";
+                        var authToken = "590de52713c995976373811ee4508604";
+
+                        TwilioClient.Init(accountSid, authToken);
+
+                        var message = MessageResource.Create(
+                            to: new PhoneNumber(ConfigurationManager.AppSettings["SmsToNumber"].ToString()),
+                            from: new PhoneNumber("+61451562474"),
+                            body:
+                            $"Buyer: {output.BuyerCashPrice.BuyerName}, Location: {output.Location.Name}, Profit: {output.Profit:c}");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+            }
         }
     }
 }
