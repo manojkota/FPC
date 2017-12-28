@@ -88,6 +88,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Common\DataLoader.cs" />
     <Compile Include="Common\Coordinate.cs" />
+    <Compile Include="Common\DirectionsRequest.cs" />
     <Compile Include="Common\DistanceMatrixRequest.cs" />
     <Compile Include="Common\DistanceMatrixResponse.cs" />
     <Compile Include="Controllers\GrowerFreightCalculatorController.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Models\FrieghtEstimate.cs" />
     <Compile Include="Models\PriceOutput.cs" />
     <Compile Include="Models\RequestInput.cs" />
+    <Compile Include="Models\RequestInputWithLocation.cs" />
     <Compile Include="Models\TruckType.cs" />
     <Compile Include="Models\FrieghtCompany.cs" />
     <Compile Include="Models\Buyer.cs" />
@@ -122,11 +124,8 @@
       <Project>{c8c63162-8137-4292-bd98-e27c3ff5975b}</Project>
       <Name>ExcelService</Name>
     </ProjectReference>
-    </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
