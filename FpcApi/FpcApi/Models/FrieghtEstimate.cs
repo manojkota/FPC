@@ -15,5 +15,7 @@ namespace FpcApi.Models
         public decimal CostPerKm { get; set; }
 
         public decimal EstimatedPrice { get; set; }
+
+        public int NoOfTrips { get; set; }
     }
 }

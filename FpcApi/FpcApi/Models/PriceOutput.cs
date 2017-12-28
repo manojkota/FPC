@@ -14,5 +14,6 @@ namespace FpcApi.Models
         public BuyerCashPrice BuyerCashPrice { get; set; }
 
         public decimal Profit { get; set; }
+        
     }
 }
