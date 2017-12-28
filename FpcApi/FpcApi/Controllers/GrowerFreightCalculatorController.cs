@@ -12,64 +12,76 @@ namespace FpcApi.Controllers
 {
     public class GrowerFreightCalculatorController : ApiController
     {
-        [HttpGet]
+        [HttpPost]
         public IEnumerable<PriceOutput> Calculate([FromBody] RequestInput input)
         {
             var dataLoader = new DataLoader();
 
             var result = new List<PriceOutput>();
-            //if (input != null)
+            if (input != null)
             {
-                foreach (var loc in dataLoader.locations)
+                foreach (var cashPrice in dataLoader.cashPrices.Where(x=> x.Grade.Equals(input.Grade, StringComparison.InvariantCultureIgnoreCase)
+                                                                            && x.Commodity.Equals(input.Commodity, StringComparison.InvariantCultureIgnoreCase)
+                                                                          && x.Season.Equals(input.Season, StringComparison.InvariantCultureIgnoreCase)).OrderByDescending(y => y.Price))
                 {
                     //calculate distance
                     var distance = 100;
-                    var truckTypes = dataLoader.truckTypes.Where(x => 20 >= x.MinCapacity && 20 <= x.MaxCapacity);
-
+                    
                     List<FrieghtEstimate> frieghtEstimates = new List<FrieghtEstimate>();
 
-                    foreach (var truckType in truckTypes)
+                    if (input.IsOwnTruck)
                     {
-                        var frieghtCosts = dataLoader.frieghtCosts.Where(x => x.TruckTypeId == truckType.Id);
-                        foreach (var frieghtCost in frieghtCosts)
-                        {
-                            FrieghtEstimate estimate = new FrieghtEstimate();
-                            FrieghtCompany frieghtCompany = dataLoader.frieghtCompanies.FirstOrDefault(x => x.Id == frieghtCost.FrieghtCompanyId);
+                        FrieghtEstimate estimate = new FrieghtEstimate();
 
-                            estimate.FrieghtCompanyName = frieghtCompany.Name;
-                            estimate.TruckType = truckType.Type;
-                            estimate.CostPerKm = frieghtCost.CostPerKm;
-                            estimate.EstimatedPrice = frieghtCost.CostPerKm * distance;
-                            frieghtEstimates.Add(estimate);
+                        estimate.FrieghtCompanyName = string.Empty;
+                        estimate.TruckType = input.TruckTypeId.HasValue ? dataLoader.truckTypes.FirstOrDefault(x=> x.Id == input.TruckTypeId.Value).Type : string.Empty;
+                        estimate.CostPerKm = input.OwnerCostPerKm.Value;
+                        estimate.EstimatedPrice = input.OwnerCostPerKm.Value * distance * Convert.ToDecimal(input.Quantity);
+                        frieghtEstimates.Add(estimate);
+                    }
+                    else
+                    {
+                        var truckTypes = dataLoader.truckTypes.Where(x =>x.MinCapacity <= input.Quantity && input.Quantity <= x.MaxCapacity);
+
+                        foreach (var truckType in truckTypes)
+                        {
+                            var frieghtCosts = dataLoader.frieghtCosts.Where(x => x.TruckTypeId == truckType.Id);
+                            foreach (var frieghtCost in frieghtCosts)
+                            {
+                                FrieghtEstimate estimate = new FrieghtEstimate();
+                                FrieghtCompany frieghtCompany = dataLoader.frieghtCompanies.FirstOrDefault(x => x.Id == frieghtCost.FrieghtCompanyId);
+
+                                estimate.FrieghtCompanyName = frieghtCompany.Name;
+                                estimate.TruckType = truckType.Type;
+                                estimate.CostPerKm = frieghtCost.CostPerKm;
+                                estimate.EstimatedPrice = frieghtCost.CostPerKm * distance * Convert.ToDecimal(input.Quantity);
+                                frieghtEstimates.Add(estimate);
+                            }
                         }
                     }
 
-                    var cashPrices = dataLoader.cashPrices.Where(x => x.LocationId == loc.Id);
-                    foreach (var cashPrice in cashPrices)
+                    foreach (var frieghtEstimate in frieghtEstimates)
                     {
-                        foreach (var frieghtEstimate in frieghtEstimates)
+                        PriceOutput output = new PriceOutput();
+                        output.Location = dataLoader.locations.FirstOrDefault(x => x.Id == cashPrice.LocationId);
+                        output.BuyerCashPrice = new BuyerCashPrice
                         {
-                            PriceOutput output = new PriceOutput();
-                            output.Location = loc;
-                            output.BuyerCashPrice = new BuyerCashPrice
-                            {
-                                BuyerName = dataLoader.buyers.FirstOrDefault(x=> x.Id == cashPrice.BuyerId).Name,
-                                BuyerPrice = cashPrice.Price,
-                                Commodity = cashPrice.Commodity,
-                                Grade = cashPrice.Grade,
-                                Season = cashPrice.Season,
-                                EstimatedPrice = cashPrice.Price * 100
-                            };
-                            output.FrieghtEstimate = frieghtEstimate;
-                            output.Profit = output.BuyerCashPrice.EstimatedPrice - frieghtEstimate.EstimatedPrice;
+                            BuyerName = dataLoader.buyers.FirstOrDefault(x => x.Id == cashPrice.BuyerId).Name,
+                            BuyerPrice = cashPrice.Price,
+                            Commodity = cashPrice.Commodity,
+                            Grade = cashPrice.Grade,
+                            Season = cashPrice.Season,
+                            EstimatedPrice = cashPrice.Price * Convert.ToDecimal(input.Quantity)
+                        };
+                        output.FrieghtEstimate = frieghtEstimate;
+                        output.Profit = (output.BuyerCashPrice.EstimatedPrice - frieghtEstimate.EstimatedPrice);
 
-                            result.Add(output);
-                        }
+                        result.Add(output);
                     }
                 }
             }
 
-            return result;
+            return result.OrderByDescending(x=> x.Profit);
         }
     }
 }

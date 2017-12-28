@@ -24,7 +24,5 @@ namespace FpcApi.Models
         public int? TruckTypeId { get; set; }
 
         public double Quantity { get; set; }
-
-        public int Radius { get; set; }
     }
 }
