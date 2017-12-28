@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using System.Web.Http;
 using FpcApi.Common;
 using FpcApi.Models;
@@ -12,18 +13,32 @@ namespace FpcApi.Controllers
 {
     public class GrowerFreightCalculatorController : ApiController
     {
-        [HttpGet]
-        public IEnumerable<PriceOutput> Calculate([FromBody] RequestInput input)
+        [HttpPost]
+        public async Task<IEnumerable<PriceOutput>> Calculate([FromBody] RequestInput input)
         {
             var dataLoader = new DataLoader();
 
             var result = new List<PriceOutput>();
+
+            var distancesRequest = new DistanceMatrixRequest
+                (
+                    new [] { new Coordinate(Convert.ToDecimal(input.Latitude), Convert.ToDecimal(input.Longitude)) },
+                    dataLoader.locations.Select(l => new Coordinate(Convert.ToDecimal(l.Latitude), Convert.ToDecimal(l.Longitude))),
+                    "AIzaSyDM3VKkOOwNU5JZ05fKpCTWybwMyASqPOU"
+                );
+
+            var distancesResponse = await distancesRequest.Get();
+                
+            var distances = distancesResponse.Rows[0].Elements.Select(x => x.Distance.Value);
+
             //if (input != null)
             {
-                foreach (var loc in dataLoader.locations)
+                foreach (var locAndDistance in dataLoader.locations.Zip(distances, (l, d) => new Tuple<Location, int>(l, d)))
                 {
+                    var loc = locAndDistance.Item1;
+
                     //calculate distance
-                    var distance = 100;
+                    var distance = locAndDistance.Item2;
                     var truckTypes = dataLoader.truckTypes.Where(x => 20 >= x.MinCapacity && 20 <= x.MaxCapacity);
 
                     List<FrieghtEstimate> frieghtEstimates = new List<FrieghtEstimate>();
