@@ -41,7 +41,15 @@ namespace FpcApi.Controllers
                     }
                     else
                     {
+                        int noOfTrips = 1;
                         var truckTypes = dataLoader.truckTypes.Where(x =>x.MinCapacity <= input.Quantity && input.Quantity <= x.MaxCapacity);
+                        while (!truckTypes.Any())
+                        {
+                            noOfTrips = noOfTrips + 1;
+                            var dividedQuantity = input.Quantity / noOfTrips;
+                            truckTypes = dataLoader.truckTypes.Where(x =>
+                                x.MinCapacity <= dividedQuantity && dividedQuantity <= x.MaxCapacity);
+                        }
 
                         foreach (var truckType in truckTypes)
                         {
@@ -55,6 +63,7 @@ namespace FpcApi.Controllers
                                 estimate.TruckType = truckType.Type;
                                 estimate.CostPerKm = frieghtCost.CostPerKm;
                                 estimate.EstimatedPrice = frieghtCost.CostPerKm * distance * Convert.ToDecimal(input.Quantity);
+                                estimate.NoOfTrips = noOfTrips;
                                 frieghtEstimates.Add(estimate);
                             }
                         }
@@ -75,7 +84,7 @@ namespace FpcApi.Controllers
                         };
                         output.FrieghtEstimate = frieghtEstimate;
                         output.Profit = (output.BuyerCashPrice.EstimatedPrice - frieghtEstimate.EstimatedPrice);
-
+                        
                         result.Add(output);
                     }
                 }
