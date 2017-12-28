@@ -166,7 +166,7 @@ namespace FpcApi.Controllers
                         PaymentTerms = dataLoader.buyers.FirstOrDefault(x => x.Id == cashPrice.BuyerId).PaymentTerms
                     };
                     output.FrieghtEstimate = frieghtEstimate;
-                    output.Profit = (output.BuyerCashPrice.EstimatedPrice - frieghtEstimate.EstimatedPrice);
+                    output.Profit = Math.Round((output.BuyerCashPrice.EstimatedPrice - frieghtEstimate.EstimatedPrice)/Convert.ToDecimal(input.Quantity), 2);
 
                     result.Add(output);
                 }
