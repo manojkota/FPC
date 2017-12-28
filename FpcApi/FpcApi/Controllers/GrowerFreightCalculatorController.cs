@@ -192,7 +192,8 @@ namespace FpcApi.Controllers
                             to: new PhoneNumber(ConfigurationManager.AppSettings["SmsToNumber"].ToString()),
                             from: new PhoneNumber("+61451562474"),
                             body:
-                            $"Buyer: {output.BuyerCashPrice.BuyerName}, Location: {output.Location.Name}, Profit: {output.Profit:c}");
+                            $"AgriDigital Optimised Price for {DateTime.UtcNow.ToString("dd/MM/yyyy")}: \n" +
+                            $"Buyer: {output.BuyerCashPrice.BuyerName}, Location: {output.Location.Name}, Estimated price: {output.BuyerCashPrice.BuyerPrice:c} /mt");
                     }
                 }
             }
