@@ -19,27 +19,27 @@ namespace FpcApi.Controllers
             var dataLoader = new DataLoader();
 
             var result = new List<PriceOutput>();
-
-            var distancesRequest = new DistanceMatrixRequest
+            if (input != null)
+            {
+                var distancesRequest = new DistanceMatrixRequest
                 (
-                    new [] { new Coordinate(Convert.ToDecimal(input.Latitude), Convert.ToDecimal(input.Longitude)) },
+                    new[] { new Coordinate(Convert.ToDecimal(input.Latitude), Convert.ToDecimal(input.Longitude)) },
                     dataLoader.locations.Select(l => new Coordinate(Convert.ToDecimal(l.Latitude), Convert.ToDecimal(l.Longitude))),
                     "AIzaSyDM3VKkOOwNU5JZ05fKpCTWybwMyASqPOU"
                 );
 
-            var distancesResponse = await distancesRequest.Get();
-                
-            var distances = distancesResponse.Rows[0].Elements.Select(x => x.Distance.Value);
+                var distancesResponse = await distancesRequest.Get();
 
-            //if (input != null)
-            {
-                foreach (var locAndDistance in dataLoader.locations.Zip(distances, (l, d) => new Tuple<Location, int>(l, d)))
+                var distances = distancesResponse.Rows[0].Elements.Select(x => x.Distance.Value);
+
+                var distanceEstimator = dataLoader.locations.Zip(distances, (l, d) => new Tuple<Location, decimal>(l, (d/1000)));
+
+                foreach (var cashPrice in dataLoader.cashPrices.Where(x => x.Grade.Equals(input.Grade, StringComparison.InvariantCultureIgnoreCase)
+                                                                            && x.Commodity.Equals(input.Commodity, StringComparison.InvariantCultureIgnoreCase)
+                                                                          && x.Season.Equals(input.Season, StringComparison.InvariantCultureIgnoreCase)).OrderByDescending(y => y.Price))
                 {
-                    var loc = locAndDistance.Item1;
-
                     //calculate distance
-                    var distance = locAndDistance.Item2;
-                    var truckTypes = dataLoader.truckTypes.Where(x => 20 >= x.MinCapacity && 20 <= x.MaxCapacity);
+                    var distance = distanceEstimator.FirstOrDefault(x=> x.Item1.Id == cashPrice.LocationId).Item2;
 
                     List<FrieghtEstimate> frieghtEstimates = new List<FrieghtEstimate>();
 
@@ -48,7 +48,7 @@ namespace FpcApi.Controllers
                         FrieghtEstimate estimate = new FrieghtEstimate();
 
                         estimate.FrieghtCompanyName = string.Empty;
-                        estimate.TruckType = input.TruckTypeId.HasValue ? dataLoader.truckTypes.FirstOrDefault(x=> x.Id == input.TruckTypeId.Value).Type : string.Empty;
+                        estimate.TruckType = input.TruckTypeId.HasValue ? dataLoader.truckTypes.FirstOrDefault(x => x.Id == input.TruckTypeId.Value).Type : string.Empty;
                         estimate.CostPerKm = input.OwnerCostPerKm.Value;
                         estimate.EstimatedPrice = input.OwnerCostPerKm.Value * distance * Convert.ToDecimal(input.Quantity);
                         frieghtEstimates.Add(estimate);
@@ -56,7 +56,7 @@ namespace FpcApi.Controllers
                     else
                     {
                         int noOfTrips = 1;
-                        var truckTypes = dataLoader.truckTypes.Where(x =>x.MinCapacity <= input.Quantity && input.Quantity <= x.MaxCapacity);
+                        var truckTypes = dataLoader.truckTypes.Where(x => x.MinCapacity <= input.Quantity && input.Quantity <= x.MaxCapacity);
                         while (!truckTypes.Any())
                         {
                             noOfTrips = noOfTrips + 1;
@@ -76,7 +76,7 @@ namespace FpcApi.Controllers
                                 estimate.FrieghtCompanyName = frieghtCompany.Name;
                                 estimate.TruckType = truckType.Type;
                                 estimate.CostPerKm = frieghtCost.CostPerKm;
-                                estimate.EstimatedPrice = frieghtCost.CostPerKm * distance * Convert.ToDecimal(input.Quantity);
+                                estimate.EstimatedPrice = frieghtCost.CostPerKm * distance * Convert.ToDecimal(truckType.MaxCapacity);
                                 estimate.NoOfTrips = noOfTrips;
                                 frieghtEstimates.Add(estimate);
                             }
@@ -98,13 +98,13 @@ namespace FpcApi.Controllers
                         };
                         output.FrieghtEstimate = frieghtEstimate;
                         output.Profit = (output.BuyerCashPrice.EstimatedPrice - frieghtEstimate.EstimatedPrice);
-                        
+
                         result.Add(output);
                     }
                 }
             }
 
-            return result.OrderByDescending(x=> x.Profit);
+            return result.OrderByDescending(x => x.Profit);
         }
     }
 }
