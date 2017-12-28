@@ -61,7 +61,7 @@ namespace FpcApi.Controllers
                 (
                     new[] { new Coordinate(Convert.ToDecimal(input.Latitude), Convert.ToDecimal(input.Longitude)) },
                     dataLoader.locations.Select(l => new Coordinate(Convert.ToDecimal(l.Latitude), Convert.ToDecimal(l.Longitude))),
-                    "AIzaSyDM3VKkOOwNU5JZ05fKpCTWybwMyASqPOU"
+                    ConfigurationManager.AppSettings["GoogleMapsKey"].ToString()
                 );
 
                 var distancesResponse = await distancesRequest.Get();
