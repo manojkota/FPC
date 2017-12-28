@@ -43,19 +43,31 @@ namespace FpcApi.Controllers
 
                     List<FrieghtEstimate> frieghtEstimates = new List<FrieghtEstimate>();
 
+                    int noOfTrips = 1;
+
                     if (input.IsOwnTruck)
                     {
                         FrieghtEstimate estimate = new FrieghtEstimate();
 
+                        var selectedTruckType = input.TruckTypeId.HasValue ? dataLoader.truckTypes.FirstOrDefault(x => x.Id == input.TruckTypeId.Value) : null;
+
                         estimate.FrieghtCompanyName = string.Empty;
-                        estimate.TruckType = input.TruckTypeId.HasValue ? dataLoader.truckTypes.FirstOrDefault(x => x.Id == input.TruckTypeId.Value).Type : string.Empty;
+                        estimate.TruckType = input.TruckTypeId.HasValue ? selectedTruckType.Type : string.Empty;
                         estimate.CostPerKm = input.OwnerCostPerKm.Value;
-                        estimate.EstimatedPrice = input.OwnerCostPerKm.Value * distance * Convert.ToDecimal(input.Quantity);
+                        estimate.EstimatedPrice = input.OwnerCostPerKm.Value * distance * Convert.ToDecimal(input.TruckTypeId.HasValue ? selectedTruckType.MaxCapacity : input.Quantity);
+
+                        var currentCapacity = selectedTruckType?.MaxCapacity;
+                        while (currentCapacity < input.Quantity)
+                        {
+                            noOfTrips = noOfTrips + 1;
+                            currentCapacity = currentCapacity * noOfTrips;
+                        }
+                        estimate.NoOfTrips = noOfTrips;
+
                         frieghtEstimates.Add(estimate);
                     }
                     else
                     {
-                        int noOfTrips = 1;
                         var truckTypes = dataLoader.truckTypes.Where(x => x.MinCapacity <= input.Quantity && input.Quantity <= x.MaxCapacity);
                         while (!truckTypes.Any())
                         {
