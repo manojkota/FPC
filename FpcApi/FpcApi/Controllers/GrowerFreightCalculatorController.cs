@@ -199,7 +199,7 @@ namespace FpcApi.Controllers
                                     from: new PhoneNumber("+61451562474"),
                                     body:
                                     $"AgriDigital Optimised Price for {DateTime.UtcNow.ToString("dd/MM/yyyy")}: \n" +
-                                    $"Buyer: {output.BuyerCashPrice.BuyerName}, Location: {output.Location.Name}, Estimated price: {output.BuyerCashPrice.BuyerPrice:c} /mt");
+                                    $"Buyer: {output.BuyerCashPrice.BuyerName}, Location: {output.Location.Name}, Net price: {output.Profit:c} /mt");
                             }
                         }
                     }
