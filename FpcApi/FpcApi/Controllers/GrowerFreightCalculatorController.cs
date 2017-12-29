@@ -188,12 +188,20 @@ namespace FpcApi.Controllers
 
                         TwilioClient.Init(accountSid, authToken);
 
-                        var message = MessageResource.Create(
-                            to: new PhoneNumber(ConfigurationManager.AppSettings["SmsToNumber"].ToString()),
-                            from: new PhoneNumber("+61451562474"),
-                            body:
-                            $"AgriDigital Optimised Price for {DateTime.UtcNow.ToString("dd/MM/yyyy")}: \n" +
-                            $"Buyer: {output.BuyerCashPrice.BuyerName}, Location: {output.Location.Name}, Estimated price: {output.BuyerCashPrice.BuyerPrice:c} /mt");
+                        var numbers = ConfigurationManager.AppSettings["SmsToNumber"].ToString().Split(';');
+
+                        foreach (var number in numbers)
+                        {
+                            if (!string.IsNullOrEmpty(number))
+                            {
+                                var message = MessageResource.Create(
+                                    to: new PhoneNumber(number),
+                                    from: new PhoneNumber("+61451562474"),
+                                    body:
+                                    $"AgriDigital Optimised Price for {DateTime.UtcNow.ToString("dd/MM/yyyy")}: \n" +
+                                    $"Buyer: {output.BuyerCashPrice.BuyerName}, Location: {output.Location.Name}, Estimated price: {output.BuyerCashPrice.BuyerPrice:c} /mt");
+                            }
+                        }
                     }
                 }
             }
