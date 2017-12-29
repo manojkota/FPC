@@ -109,8 +109,8 @@ namespace FpcApi.Controllers
 
                     estimate.FrieghtCompanyName = string.Empty;
                     estimate.TruckType = input.TruckTypeId.HasValue ? selectedTruckType.Type : string.Empty;
-                    estimate.CostPerKm = input.OwnerCostPerKm.Value;
-                    estimate.EstimatedPrice = input.OwnerCostPerKm.Value * distance * Convert.ToDecimal(input.TruckTypeId.HasValue ? selectedTruckType.MaxCapacity : input.Quantity);
+                    estimate.CostPerKm = input.OwnerCostPerKm.HasValue ? input.OwnerCostPerKm.Value : dataLoader.frieghtCosts.FirstOrDefault(x=> x.TruckTypeId == selectedTruckType.Id).CostPerKm;
+                    estimate.EstimatedPrice = estimate.CostPerKm * distance * Convert.ToDecimal(input.TruckTypeId.HasValue ? selectedTruckType.MaxCapacity : input.Quantity);
 
                     var currentCapacity = selectedTruckType?.MaxCapacity;
                     while (currentCapacity < input.Quantity)
